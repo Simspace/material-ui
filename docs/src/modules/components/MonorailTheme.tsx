@@ -12,6 +12,10 @@ const monorailThemeOptions: ThemeOptions = {
       main: '#d41c0b',
       dark: '#ad0c00',
     },
+    action: {
+      disabled: '#fff',
+      disabledBackground: '#7AA8FF',
+    },
   },
   typography: {
     button: {
@@ -30,14 +34,7 @@ const monorailThemeOptions: ThemeOptions = {
           border: '1px solid',
         },
         contained: {
-          boxShadow: 'none',
           color: '#fff',
-          '&:hover': {
-            boxShadow: 'none',
-          },
-          '&:active': {
-            boxShadow: 'none',
-          },
           '&:focus': {
             boxShadow: '0px 0px 0px 3px #7AA8FF',
           },
@@ -68,6 +65,11 @@ const monorailThemeOptions: ThemeOptions = {
             borderColor: '#890900',
           },
         },
+      },
+      defaultProps: {
+        variant: 'contained',
+        color: 'primary',
+        disableElevation: true,
       },
     },
     MuiInputLabel: {
