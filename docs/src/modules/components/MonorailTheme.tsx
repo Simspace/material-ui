@@ -32,6 +32,7 @@ const monorailThemeOptions: ThemeOptions = {
           letterSpacing: 0,
           padding: '2px 12px 1px',
           border: '1px solid',
+          minWidth: 0,
         },
         contained: {
           color: '#fff',
