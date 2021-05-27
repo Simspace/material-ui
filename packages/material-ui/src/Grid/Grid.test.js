@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { expect } from 'chai';
 import { createMount, describeConformanceV5, createClientRender, screen } from 'test/utils';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import Grid from './Grid';
-import classes from './gridClasses';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import Grid, { gridClasses as classes } from '@material-ui/core/Grid';
 
 describe('<Grid />', () => {
   const render = createClientRender();
@@ -63,6 +62,21 @@ describe('<Grid />', () => {
 
       expect(container.firstChild).to.have.class(classes['spacing-xs-1']);
     });
+
+    it('should support decimal values', () => {
+      const { container } = render(
+        <Grid container spacing={1.5}>
+          <Grid item data-testid="child" />
+        </Grid>,
+      );
+
+      expect(container.firstChild).to.have.class('MuiGrid-spacing-xs-1.5');
+
+      expect(screen.getByTestId('child')).toHaveComputedStyle({
+        paddingTop: '12px',
+        paddingLeft: '12px',
+      });
+    });
   });
 
   describe('gutter', () => {
@@ -71,7 +85,7 @@ describe('<Grid />', () => {
 
       const parentWidth = 500;
       const remValue = 16;
-      const remTheme = createMuiTheme({
+      const remTheme = createTheme({
         spacing: (factor) => `${0.25 * factor}rem`,
       });
 

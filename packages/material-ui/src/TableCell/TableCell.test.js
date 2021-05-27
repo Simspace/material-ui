@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { expect } from 'chai';
 import { createClientRender, createMount, describeConformanceV5 } from 'test/utils';
-import TableCell from './TableCell';
-import classes from './tableCellClasses';
+import TableCell, { tableCellClasses as classes } from '@material-ui/core/TableCell';
 
 describe('<TableCell />', () => {
   const render = createClientRender();
@@ -21,14 +20,14 @@ describe('<TableCell />', () => {
     classes,
     inheritComponent: 'td',
     render: (node) => {
-      const { container, ...rest } = render(
+      const { container, ...other } = render(
         <table>
           <tbody>
             <tr>{node}</tr>
           </tbody>
         </table>,
       );
-      return { container: container.firstChild.firstChild.firstChild, ...rest };
+      return { container: container.firstChild.firstChild.firstChild, ...other };
     },
     mount: (node) => {
       const wrapper = mount(
@@ -50,8 +49,8 @@ describe('<TableCell />', () => {
 
   describe('prop: padding', () => {
     it("doesn't not have a class for padding by default", () => {
-      const { container } = renderInTable(<TableCell padding="default" />);
-      expect(container.querySelector('td')).not.to.have.class(classes.paddingDefault);
+      const { container } = renderInTable(<TableCell padding="normal" />);
+      expect(container.querySelector('td')).not.to.have.class(classes.paddingNormal);
     });
 
     it('has a class when `none`', () => {

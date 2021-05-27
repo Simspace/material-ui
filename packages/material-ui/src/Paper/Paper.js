@@ -1,24 +1,23 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import { chainPropTypes, integerPropType, deepmerge } from '@material-ui/utils';
+import { chainPropTypes, integerPropType } from '@material-ui/utils';
 import { unstable_composeClasses as composeClasses } from '@material-ui/unstyled';
 import experimentalStyled from '../styles/experimentalStyled';
 import useThemeProps from '../styles/useThemeProps';
+import { alpha } from '../styles/colorManipulator';
 import useTheme from '../styles/useTheme';
 import { getPaperUtilityClass } from './paperClasses';
 
-const overridesResolver = (props, styles) => {
-  const { styleProps } = props;
-
-  return deepmerge(
-    {
-      ...styles[styleProps.variant],
-      ...(!styleProps.square && styles.rounded),
-      ...(styleProps.variant === 'elevation' && styles[`elevation${styleProps.elevation}`]),
-    },
-    styles.root || {},
-  );
+// Inspired by https://github.com/material-components/material-components-ios/blob/bca36107405594d5b7b16265a5b0ed698f85a5ee/components/Elevation/src/UIColor%2BMaterialElevation.m#L61
+const getOverlayAlpha = (elevation) => {
+  let alphaValue;
+  if (elevation < 1) {
+    alphaValue = 5.11916 * elevation ** 2;
+  } else {
+    alphaValue = 4.5 * Math.log(elevation + 1) + 2;
+  }
+  return (alphaValue / 100).toFixed(2);
 };
 
 const useUtilityClasses = (styleProps) => {
@@ -36,34 +35,43 @@ const useUtilityClasses = (styleProps) => {
   return composeClasses(slots, getPaperUtilityClass, classes);
 };
 
-const PaperRoot = experimentalStyled(
-  'div',
-  {},
-  {
-    name: 'MuiPaper',
-    slot: 'Root',
-    overridesResolver,
+const PaperRoot = experimentalStyled('div', {
+  name: 'MuiPaper',
+  slot: 'Root',
+  overridesResolver: (props, styles) => {
+    const { styleProps } = props;
+
+    return {
+      ...styles.root,
+      ...styles[styleProps.variant],
+      ...(!styleProps.square && styles.rounded),
+      ...(styleProps.variant === 'elevation' && styles[`elevation${styleProps.elevation}`]),
+    };
   },
-)(({ theme, styleProps }) => {
-  return {
-    /* Styles applied to the root element. */
-    backgroundColor: theme.palette.background.paper,
-    color: theme.palette.text.primary,
-    transition: theme.transitions.create('box-shadow'),
-    /* Styles applied to the root element unless `square={true}`. */
-    ...(!styleProps.square && {
-      borderRadius: theme.shape.borderRadius,
+})(({ theme, styleProps }) => ({
+  /* Styles applied to the root element. */
+  backgroundColor: theme.palette.background.paper,
+  color: theme.palette.text.primary,
+  transition: theme.transitions.create('box-shadow'),
+  /* Styles applied to the root element unless `square={true}`. */
+  ...(!styleProps.square && {
+    borderRadius: theme.shape.borderRadius,
+  }),
+  /* Styles applied to the root element if `variant="outlined"`. */
+  ...(styleProps.variant === 'outlined' && {
+    border: `1px solid ${theme.palette.divider}`,
+  }),
+  /* Styles applied to the root element if `variant="elevation"`. */
+  ...(styleProps.variant === 'elevation' && {
+    boxShadow: theme.shadows[styleProps.elevation],
+    ...(theme.palette.mode === 'dark' && {
+      backgroundImage: `linear-gradient(${alpha(
+        '#fff',
+        getOverlayAlpha(styleProps.elevation),
+      )}, ${alpha('#fff', getOverlayAlpha(styleProps.elevation))})`,
     }),
-    /* Styles applied to the root element if `variant="outlined"`. */
-    ...(styleProps.variant === 'outlined' && {
-      border: `1px solid ${theme.palette.divider}`,
-    }),
-    /* Styles applied to the root element if `variant="elevation"`. */
-    ...(styleProps.variant === 'elevation' && {
-      boxShadow: theme.shadows[styleProps.elevation],
-    }),
-  };
-});
+  }),
+}));
 
 const Paper = React.forwardRef(function Paper(inProps, ref) {
   const props = useThemeProps({ props: inProps, name: 'MuiPaper' });

@@ -1,6 +1,6 @@
 {
   "name": "@material-ui/system",
-  "version": "5.0.0-alpha.27",
+  "version": "5.0.0-alpha.34",
   "private": false,
   "author": "Material-UI Team",
   "description": "CSS utilities for rapidly laying out custom designs.",
@@ -39,8 +39,7 @@
   },
   "peerDependencies": {
     "@types/react": "^16.8.6 || ^17.0.0",
-    "react": "^17.0.0",
-    "react-dom": "^17.0.0"
+    "react": "^17.0.0"
   },
   "peerDependenciesMeta": {
     "@types/react": {
@@ -49,7 +48,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.4.4",
-    "@material-ui/utils": "5.0.0-alpha.27",
+    "@material-ui/utils": "5.0.0-alpha.33",
     "csstype": "^3.0.2",
     "prop-types": "^15.7.2"
   },
@@ -58,6 +57,6 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=10.0.0"
+    "node": ">=12.0.0"
   }
 }

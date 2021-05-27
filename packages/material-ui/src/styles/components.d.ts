@@ -227,6 +227,7 @@ export interface Components {
   MuiInputBase?: {
     defaultProps?: ComponentsProps['MuiInputBase'];
     styleOverrides?: ComponentsOverrides['MuiInputBase'];
+    variants?: ComponentsVariants['MuiInputBase'];
   };
   MuiInputLabel?: {
     defaultProps?: ComponentsProps['MuiInputLabel'];
@@ -463,8 +464,5 @@ export interface Components {
   };
   MuiUseMediaQuery?: {
     defaultProps?: ComponentsProps['MuiUseMediaQuery'];
-  };
-  MuiWithWidth?: {
-    defaultProps?: ComponentsProps['MuiWithWidth'];
   };
 }

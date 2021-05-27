@@ -20,7 +20,8 @@ You might need to change the style of a component for a specific implementation,
 
 ### Use the `sx` prop
 
-The easiest way to add style overrides for a one-off situation is to use the `sx` prop available on all Material-UI components. Here is an example:
+The easiest way to add style overrides for a one-off situation is to use the [`sx` prop](/system/basics/#the-sx-prop) available on all Material-UI components.
+Here is an example:
 
 {{"demo": "pages/customization/how-to-customize/SxProp.js"}}
 
@@ -145,11 +146,30 @@ Here are four alternatives; each has its pros and cons.
 
 ### Dynamic CSS
 
+Using the `styled()` utility offers a simple way for adding dynamic styles based on props.
+
 {{"demo": "pages/customization/how-to-customize/DynamicCSS.js", "defaultCodeOpen": false}}
 
-### Class name branch
+> ⚠️ Note that if you are using TypeScript you will need to update the prop's types of the new component.
 
-{{"demo": "pages/customization/how-to-customize/DynamicClassName.js"}}
+```tsx
+import * as React from 'react';
+import { experimentalStyled as styled } from '@material-ui/core/styles';
+import Slider, { SliderProps } from '@material-ui/core/Slider';
+
+interface StyledSliderProps extends SliderProps {
+  success?: boolean;
+}
+
+const StyledSlider = styled(Slider, {
+  shouldForwardProp: (prop) => prop !== 'success',
+})<StyledSliderProps>(({ success, theme }) => ({
+  ...(success &&
+    {
+      // the overrides added when the new prop is used
+    }),
+}));
+```
 
 ### CSS variables
 

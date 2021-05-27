@@ -1,25 +1,12 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import { deepmerge } from '@material-ui/utils';
 import { unstable_composeClasses as composeClasses } from '@material-ui/unstyled';
 import experimentalStyled from '../styles/experimentalStyled';
 import useThemeProps from '../styles/useThemeProps';
 import capitalize from '../utils/capitalize';
 import Paper from '../Paper';
 import { getAppBarUtilityClass } from './appBarClasses';
-
-const overridesResolver = (props, styles) => {
-  const { styleProps } = props;
-
-  return deepmerge(
-    {
-      ...styles[`position${capitalize(styleProps.position)}`],
-      ...styles[`color${capitalize(styleProps.color)}`],
-    },
-    styles.root || {},
-  );
-};
 
 const useUtilityClasses = (styleProps) => {
   const { color, position, classes } = styleProps;
@@ -31,15 +18,19 @@ const useUtilityClasses = (styleProps) => {
   return composeClasses(slots, getAppBarUtilityClass, classes);
 };
 
-const AppBarRoot = experimentalStyled(
-  Paper,
-  {},
-  {
-    name: 'MuiAppBar',
-    slot: 'Root',
-    overridesResolver,
+const AppBarRoot = experimentalStyled(Paper, {
+  name: 'MuiAppBar',
+  slot: 'Root',
+  overridesResolver: (props, styles) => {
+    const { styleProps } = props;
+
+    return {
+      ...styles.root,
+      ...styles[`position${capitalize(styleProps.position)}`],
+      ...styles[`color${capitalize(styleProps.color)}`],
+    };
   },
-)(({ theme, styleProps }) => {
+})(({ theme, styleProps }) => {
   const backgroundColorDefault =
     theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900];
 
@@ -113,11 +104,7 @@ const AppBarRoot = experimentalStyled(
 });
 
 const AppBar = React.forwardRef(function AppBar(inProps, ref) {
-  const props = useThemeProps({
-    props: inProps,
-    name: 'MuiAppBar',
-  });
-
+  const props = useThemeProps({ props: inProps, name: 'MuiAppBar' });
   const { className, color = 'primary', position = 'fixed', ...other } = props;
 
   const styleProps = {
@@ -172,10 +159,6 @@ AppBar.propTypes /* remove-proptypes */ = {
     PropTypes.oneOf(['default', 'inherit', 'primary', 'secondary', 'transparent']),
     PropTypes.string,
   ]),
-  /**
-   * @ignore
-   */
-  component: PropTypes.elementType,
   /**
    * The positioning type. The behavior of the different options is described
    * [in the MDN web docs](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Positioning).

@@ -59,11 +59,12 @@ function Image(props: ImageProps) {
 function BrandingHero() {
   return (
     <Container>
-      <Typography variant="h1" align="center" sx={{ mt: 9 }}>
-        We&apos;re on a mission to make building UIs with <UnderlinedText>React</UnderlinedText>{' '}
-        fun.
+      <Typography variant="h1" align="center" sx={{ mt: 9, mx: 'auto' }}>
+        {"We're are making building "}
+        <Box component="span" sx={{ display: { xs: 'none', md: 'block' } }} />
+        UIs more <UnderlinedText>accessible</UnderlinedText>
       </Typography>
-      <Typography sx={{ mt: 4, maxWidth: 670, mx: 'auto', textAlign: 'center', mb: 15 }}>
+      <Typography sx={{ mt: 4, maxWidth: '60ch', mx: 'auto', textAlign: 'center', mb: 15 }}>
         Material-UI started back in 2014 to unify <Link href="https://reactjs.org/">React</Link> and{' '}
         <Link href="https://material.io/design">Material Design</Link>.
         <br />
@@ -365,7 +366,7 @@ function BrandingTeam() {
           }}
         />
         <Typography variant="h2">Team</Typography>
-        <Typography sx={{ mt: 1.5, mb: 7, maxWidth: 700 }}>
+        <Typography sx={{ mt: 1.5, mb: 7, maxWidth: '60ch' }}>
           Material-UI is maintained by a group of invaluable core contributors, with the massive
           support and involvement of the community.
         </Typography>
@@ -394,7 +395,7 @@ const company = [
   {
     name: 'Sebastian Silbermann',
     src: '/static/branding/about/sebastian.jpg',
-    title: 'Community focus',
+    title: 'Core components team',
     location: 'Dresden, Germany',
     twitter: 'sebsilbermann',
     github: 'eps1lon',
@@ -402,7 +403,7 @@ const company = [
   {
     name: 'Damien Tassone',
     src: '/static/branding/about/damien.jpg',
-    title: 'Enterprise focus',
+    title: 'Advanced components team',
     location: 'Barcelona, Spain',
     twitter: 'madKakoO',
     github: 'dtassone',
@@ -410,7 +411,7 @@ const company = [
   {
     name: 'Marija Najdova',
     src: '/static/branding/about/marija.jpg',
-    title: 'Community focus',
+    title: 'Core components team',
     location: 'Skopje, North Macedonia',
     twitter: 'marijanajdova',
     github: 'mnajdova',
@@ -418,10 +419,25 @@ const company = [
   {
     name: 'Danail Hadjiatanasov',
     src: '/static/branding/about/danail.jpg',
-    title: 'Enterprise focus',
+    title: 'Advanced components team',
     location: 'Amsterdam, Netherlands',
     twitter: 'danail_h',
     github: 'DanailH',
+  },
+  {
+    name: 'Matheus Wichman',
+    src: '/static/branding/about/matheus.jpg',
+    title: 'Advanced components team',
+    location: 'Esteio, Brazil',
+    github: 'm4theushw',
+  },
+  {
+    name: 'Siriwat Kunaporn',
+    src: '/static/branding/about/siriwat.jpg',
+    title: 'Core components team',
+    location: 'Bangkok, Thailand',
+    twitter: 'siriwatknp',
+    github: 'siriwatknp',
   },
 ];
 
@@ -445,7 +461,7 @@ function BrandingCompany() {
         <Typography variant="h3">
           <UnderlinedText>Company</UnderlinedText>
         </Typography>
-        <Typography sx={{ mt: 1.5, mb: 7, maxWidth: 700 }}>
+        <Typography sx={{ mt: 1.5, mb: 7, maxWidth: '60ch' }}>
           The development of the project and its ecosystem is guided by an international team.
         </Typography>
         <Grid container spacing={4}>
@@ -504,7 +520,7 @@ function BrandingContributors() {
         <Typography variant="h3">
           Community <UnderlinedText>Contributors</UnderlinedText>
         </Typography>
-        <Typography sx={{ mt: 1.5, mb: 7, maxWidth: 700 }}>
+        <Typography sx={{ mt: 1.5, mb: 7, maxWidth: '60ch' }}>
           Some members of the community have so enriched it, that they deserve special mention.
         </Typography>
         <Grid container spacing={4}>
@@ -612,7 +628,7 @@ function BrandingEmeriti() {
         <Typography variant="h3">
           Community <UnderlinedText>Emeriti</UnderlinedText>
         </Typography>
-        <Typography sx={{ mt: 1.5, mb: 7, maxWidth: 700 }}>
+        <Typography sx={{ mt: 1.5, mb: 7, maxWidth: '60ch' }}>
           We honor some no-longer-active core team members who have made valuable contributons in
           the past. They advise us from time-to-time.
         </Typography>
@@ -793,7 +809,6 @@ function BrandingSupportUs() {
               href="https://opencollective.com/material-ui"
               endIcon={<OpenCollectiveIcon />}
               variant="contained"
-              size="small"
             >
               Open Collective
             </Button>

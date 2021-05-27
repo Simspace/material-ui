@@ -13,11 +13,12 @@
     "disabled": { "type": { "name": "bool" } },
     "disableFocusRipple": { "type": { "name": "bool" } },
     "disableRipple": { "type": { "name": "bool" } },
+    "fullWidth": { "type": { "name": "bool" } },
     "selected": { "type": { "name": "bool" } },
     "size": {
       "type": {
-        "name": "enum",
-        "description": "'large'<br>&#124;&nbsp;'medium'<br>&#124;&nbsp;'small'"
+        "name": "union",
+        "description": "'large'<br>&#124;&nbsp;'medium'<br>&#124;&nbsp;'small'<br>&#124;&nbsp;string"
       },
       "default": "'medium'"
     },

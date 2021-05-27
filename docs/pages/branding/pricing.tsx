@@ -17,6 +17,7 @@ import MuiAccordionDetail from '@material-ui/core/AccordionDetails';
 import Dropdown from 'docs/src/modules/branding/icons/Dropdown';
 import BrandingHeader from 'docs/src/modules/branding/BrandingHeader';
 import BrandingCard from 'docs/src/modules/branding/BrandingCard';
+import BrandingCustomerIcons from 'docs/src/modules/branding/BrandingCustomerIcons';
 import BrandingBeginToday from 'docs/src/modules/branding/BrandingBeginToday';
 import HelpIcon from 'docs/src/modules/branding/icons/Help';
 import Button from '@material-ui/core/Button';
@@ -51,7 +52,7 @@ const startMaterialUi = [
     title: 'Pro',
     content: 'Best for professional developers building data-rich enterprise applications.',
     actualPrice: 249,
-    price: 129,
+    price: 186,
     priceFor: 'per developer',
     priceDescription: 'Price capped at 10 developers',
     buttonTitle: 'Learn more',
@@ -95,7 +96,7 @@ function StartMaterialUi() {
       <Typography component="h1" variant="h2" align="center" sx={{ mt: 8 }}>
         Start using Material-UI <UnderlinedText>for free!</UnderlinedText>
       </Typography>
-      <Typography sx={{ mt: 4, maxWidth: 670, mx: 'auto', textAlign: 'center', mb: 12 }}>
+      <Typography sx={{ mt: 4, maxWidth: '60ch', mx: 'auto', textAlign: 'center', mb: 12 }}>
         The community edition lets you get going right away. Switch to a commercial plan for more
         components & premium support.
       </Typography>
@@ -144,7 +145,7 @@ function Benefits() {
       <Typography
         variant="h3"
         component="div"
-        sx={{ textAlign: 'center', mt: 8, mb: 6, maxWidth: 380, mx: 'auto' }}
+        sx={{ textAlign: 'center', mt: 8, mb: 6, maxWidth: '16ch', mx: 'auto' }}
       >
         Benefits included with all the plans
       </Typography>
@@ -192,7 +193,7 @@ function ComparePlans() {
       <Typography
         sx={{
           mt: 3,
-          maxWidth: 670,
+          maxWidth: '60ch',
           mx: 'auto',
           textAlign: 'center',
           p: { xs: '0 15px', md: 0 },
@@ -243,7 +244,7 @@ function WhatToExpect() {
         }}
       />
       <Container>
-        <Typography variant="h2" sx={{ mb: { xs: 5, md: 10 }, maxWidth: 550 }}>
+        <Typography variant="h2" sx={{ mb: { xs: 5, md: 10 }, maxWidth: '16ch' }}>
           Here&apos;s <UnderlinedText>what to expect</UnderlinedText> from Material-UI
         </Typography>
         <Grid container spacing={5}>
@@ -513,8 +514,8 @@ const faqData = [
     summary: 'Do you offer discounts to educational and non-profit organizations?',
     detail: (
       <React.Fragment>
-        Yes, we offer a 50% discount on any product license to educational, non-profit, and charity
-        entities.
+        Yes, we offer a 50% discount on all products licensed to students, instructors, non-profit,
+        and charity entities.
         <br />
         <br />
         To qualify for this discount you need to send us a document clearly indicating that you are
@@ -587,20 +588,6 @@ function FAQ() {
   );
 }
 
-const customerIcons = [
-  { image: '/static/branding/pricing/coursera.svg', width: 102, height: 16, alt: 'Coursera' },
-  { image: '/static/branding/pricing/amazon.svg', width: 92, height: 28, alt: 'Amazon' },
-  { image: '/static/branding/pricing/nasa.svg', width: 64, height: 53, alt: 'NASA' },
-  { image: '/static/branding/pricing/netflix.svg', width: 88, height: 24, alt: 'Netflix' },
-  { image: '/static/branding/pricing/unity.svg', width: 110, height: 40, alt: 'Unity' },
-  {
-    image: '/static/branding/pricing/shutterstock.svg',
-    width: 138,
-    height: 21,
-    alt: 'Shutterstock',
-  },
-];
-
 function Support() {
   return (
     <Container sx={{ textAlign: 'center' }}>
@@ -637,33 +624,6 @@ function Support() {
       >
         View support
       </Button>
-      <Grid container sx={{ mt: { xs: 8, sm: 11, lg: 15 }, alignItems: 'center' }}>
-        {customerIcons.map((customer) => (
-          <Grid
-            item
-            container
-            xs={6}
-            sm={4}
-            lg={2}
-            key={customer.image}
-            sx={{ justifyContent: 'center', my: { xs: 4, lg: 0 } }}
-          >
-            <img
-              loading="lazy"
-              width={customer.width}
-              height={customer.height}
-              src={customer.image}
-              alt={customer.alt}
-            />
-          </Grid>
-        ))}
-      </Grid>
-      <Typography
-        color="text.secondary"
-        sx={{ mt: { sm: 3, lg: 7 }, mb: { xs: 10, sm: 10, lg: 15 }, maxWidth: 400, mx: 'auto' }}
-      >
-        From startups to Fortune 500s, the world&apos;s best product teams use Material-UI.
-      </Typography>
     </Container>
   );
 }
@@ -683,6 +643,7 @@ export default function Pricing() {
       {/* <WhyEnterprises /> */}
       <FAQ />
       <Support />
+      <BrandingCustomerIcons />
       <BrandingBeginToday />
     </BrandingRoot>
   );

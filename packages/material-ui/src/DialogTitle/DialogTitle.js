@@ -7,8 +7,6 @@ import experimentalStyled from '../styles/experimentalStyled';
 import useThemeProps from '../styles/useThemeProps';
 import { getDialogTitleUtilityClass } from './dialogTitleClasses';
 
-const overridesResolver = (props, styles) => styles.root || {};
-
 const useUtilityClasses = (styleProps) => {
   const { classes } = styleProps;
 
@@ -19,15 +17,11 @@ const useUtilityClasses = (styleProps) => {
   return composeClasses(slots, getDialogTitleUtilityClass, classes);
 };
 
-const DialogTitleRoot = experimentalStyled(
-  'div',
-  {},
-  {
-    name: 'MuiDialogTitle',
-    slot: 'Root',
-    overridesResolver,
-  },
-)(() => {
+const DialogTitleRoot = experimentalStyled('div', {
+  name: 'MuiDialogTitle',
+  slot: 'Root',
+  overridesResolver: (props, styles) => styles.root,
+})(() => {
   return {
     /* Styles applied to the root element. */
     margin: 0,

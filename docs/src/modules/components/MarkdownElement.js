@@ -1,7 +1,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
+import { createTheme } from '@material-ui/core/styles';
 
 const styles = (theme) => ({
   root: {
@@ -185,7 +186,7 @@ const styles = (theme) => ({
     '& hr': {
       height: 1,
       margin: theme.spacing(6, 0),
-      border: 'none',
+      border: 0,
       flexShrink: 0,
       backgroundColor: theme.palette.divider,
     },
@@ -199,14 +200,15 @@ const styles = (theme) => ({
       lineHeight: '10px',
       color: theme.palette.text.primary,
       verticalAlign: 'middle',
-      backgroundColor: '#fafbfc',
-      border: '1px solid #d1d5da',
+      backgroundColor: theme.palette.mode === 'dark' ? 'transparent' : '#fafbfc',
+      border: `1px solid ${theme.palette.mode === 'dark' ? '#6e7681' : '#d1d5da'}`,
       borderRadius: 6,
-      boxShadow: 'inset 0 -1px 0 #d1d5da',
+      boxShadow: `inset 0 -1px 0 ${theme.palette.mode === 'dark' ? '#6e7681' : '#d1d5da'}`,
     },
   },
 });
-const useStyles = makeStyles(styles, { name: 'MarkdownElement', flip: false });
+const defaultTheme = createTheme();
+const useStyles = makeStyles(styles, { name: 'MarkdownElement', flip: false, defaultTheme });
 
 const MarkdownElement = React.forwardRef(function MarkdownElement(props, ref) {
   const { className, renderedMarkdown, ...other } = props;

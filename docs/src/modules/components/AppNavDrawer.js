@@ -1,14 +1,15 @@
 import * as React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import { createTheme } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/styles';
 import List from '@material-ui/core/List';
 import Drawer from '@material-ui/core/Drawer';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Divider from '@material-ui/core/Divider';
-import Hidden from '@material-ui/core/Hidden';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Box from '@material-ui/core/Box';
+import { unstable_useEnhancedEffect as useEnhancedEffect } from '@material-ui/utils';
 import DiamondSponsors from 'docs/src/modules/components/DiamondSponsors';
 import AppNavDrawerItem from 'docs/src/modules/components/AppNavDrawerItem';
 import Link from 'docs/src/modules/components/Link';
@@ -16,13 +17,13 @@ import { pageToTitleI18n } from 'docs/src/modules/utils/helpers';
 import PageContext from 'docs/src/modules/components/PageContext';
 import { useUserLanguage, useTranslate } from 'docs/src/modules/utils/i18n';
 
-let savedScrollTop = null;
+const savedScrollTop = {};
 
 function PersistScroll(props) {
-  const { children, enabled } = props;
+  const { slot, children, enabled } = props;
   const rootRef = React.useRef();
 
-  React.useEffect(() => {
+  useEnhancedEffect(() => {
     const parent = rootRef.current ? rootRef.current.parentElement : null;
     const activeElement = parent.querySelector('.app-drawer-active');
 
@@ -30,26 +31,26 @@ function PersistScroll(props) {
       return undefined;
     }
 
+    parent.scrollTop = savedScrollTop[slot];
+
     const activeBox = activeElement.getBoundingClientRect();
 
-    if (savedScrollTop === null || activeBox.top - savedScrollTop < 0) {
-      // Center the selected item in the list container.
-      activeElement.scrollIntoView();
-    } else {
-      parent.scrollTop = savedScrollTop;
+    if (activeBox.top < 0 || activeBox.top > window.innerHeight) {
+      parent.scrollTop += activeBox.top - 8 - 32;
     }
 
     return () => {
-      savedScrollTop = parent.scrollTop;
+      savedScrollTop[slot] = parent.scrollTop;
     };
-  }, [enabled]);
+  }, [enabled, slot]);
 
   return <div ref={rootRef}>{children}</div>;
 }
 
 PersistScroll.propTypes = {
-  children: PropTypes.node,
-  enabled: PropTypes.bool,
+  children: PropTypes.node.isRequired,
+  enabled: PropTypes.bool.isRequired,
+  slot: PropTypes.string.isRequired,
 };
 
 const styles = (theme) => ({
@@ -100,7 +101,7 @@ function renderNavItems(options) {
 function reduceChildRoutes(context) {
   const { onClose, activePage, items, depth, t } = context;
   let { page } = context;
-  if (page.displayNav === false) {
+  if (page.ordered === false) {
     return items;
   }
 
@@ -164,7 +165,7 @@ function AppNavDrawer(props) {
             </Link>
             {process.env.LIB_VERSION ? (
               <Link
-                color="textSecondary"
+                color="text.secondary"
                 variant="caption"
                 href={`https://material-ui.com${languagePrefix}/versions/`}
                 onClick={onClose}
@@ -200,21 +201,24 @@ function AppNavDrawer(props) {
             keepMounted: true,
           }}
         >
-          {drawer}
+          <PersistScroll slot="swipeable" enabled={mobileOpen}>
+            {drawer}
+          </PersistScroll>
         </SwipeableDrawer>
       ) : null}
-      {disablePermanent ? null : (
-        <Hidden lgDown implementation="css">
-          <Drawer
-            classes={{
-              paper: classes.paper,
-            }}
-            variant="permanent"
-            open
-          >
-            <PersistScroll enabled={!mobile}>{drawer}</PersistScroll>
-          </Drawer>
-        </Hidden>
+      {disablePermanent || mobile ? null : (
+        <Drawer
+          classes={{
+            paper: classes.paper,
+          }}
+          variant="permanent"
+          sx={{ display: { xs: 'none', lg: 'block' } }}
+          open
+        >
+          <PersistScroll slot="side" enabled>
+            {drawer}
+          </PersistScroll>
+        </Drawer>
       )}
     </nav>
   );
@@ -229,4 +233,5 @@ AppNavDrawer.propTypes = {
   onOpen: PropTypes.func.isRequired,
 };
 
-export default withStyles(styles)(AppNavDrawer);
+const defaultTheme = createTheme();
+export default withStyles(styles, { defaultTheme })(AppNavDrawer);

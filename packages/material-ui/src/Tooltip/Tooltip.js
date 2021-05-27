@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import { deepmerge, elementAcceptingRef } from '@material-ui/utils';
+import { elementAcceptingRef } from '@material-ui/utils';
 import { unstable_composeClasses as composeClasses } from '@material-ui/unstyled';
 import { alpha } from '../styles/colorManipulator';
 import experimentalStyled from '../styles/experimentalStyled';
@@ -20,25 +20,6 @@ function round(value) {
   return Math.round(value * 1e5) / 1e5;
 }
 
-const overridesResolver = (props, styles) => {
-  const { styleProps } = props;
-
-  return deepmerge(
-    {
-      ...(!styleProps.disableInteractive && styles.popperInteractive),
-      ...(styleProps.arrow && styles.popperArrow),
-      [`& .${tooltipClasses.tooltip}`]: {
-        ...styles.tooltip,
-        ...(styleProps.touch && styles.touch),
-        ...(styleProps.arrow && styles.tooltipArrow),
-        ...styles[`tooltipPlacement${capitalize(styleProps.placement.split('-')[0])}`],
-      },
-      [`& .${tooltipClasses.arrow}`]: styles.arrow,
-    },
-    styles.popper || {},
-  );
-};
-
 const useUtilityClasses = (styleProps) => {
   const { classes, disableInteractive, arrow, touch, placement } = styleProps;
 
@@ -56,15 +37,19 @@ const useUtilityClasses = (styleProps) => {
   return composeClasses(slots, getTooltipUtilityClass, classes);
 };
 
-const TooltipPopper = experimentalStyled(
-  Popper,
-  {},
-  {
-    name: 'MuiTooltip',
-    slot: 'Popper',
-    overridesResolver,
+const TooltipPopper = experimentalStyled(Popper, {
+  name: 'MuiTooltip',
+  slot: 'Popper',
+  overridesResolver: (props, styles) => {
+    const { styleProps } = props;
+
+    return {
+      ...styles.popper,
+      ...(!styleProps.disableInteractive && styles.popperInteractive),
+      ...(styleProps.arrow && styles.popperArrow),
+    };
   },
-)(({ theme, styleProps }) => ({
+})(({ theme, styleProps }) => ({
   /* Styles applied to the Popper element. */
   zIndex: theme.zIndex.tooltip,
   pointerEvents: 'none', // disable jss-rtl plugin
@@ -111,14 +96,20 @@ const TooltipPopper = experimentalStyled(
   }),
 }));
 
-const TooltipTooltip = experimentalStyled(
-  'div',
-  {},
-  {
-    name: 'MuiTooltip',
-    slot: 'Tooltip',
+const TooltipTooltip = experimentalStyled('div', {
+  name: 'MuiTooltip',
+  slot: 'Tooltip',
+  overridesResolver: (props, styles) => {
+    const { styleProps } = props;
+
+    return {
+      ...styles.tooltip,
+      ...(styleProps.touch && styles.touch),
+      ...(styleProps.arrow && styles.tooltipArrow),
+      ...styles[`tooltipPlacement${capitalize(styleProps.placement.split('-')[0])}`],
+    };
   },
-)(({ theme, styleProps }) => ({
+})(({ theme, styleProps }) => ({
   /* Styles applied to the tooltip (label wrapper) element. */
   backgroundColor: alpha(theme.palette.grey[700], 0.92),
   borderRadius: theme.shape.borderRadius,
@@ -145,45 +136,42 @@ const TooltipTooltip = experimentalStyled(
   /* Styles applied to the tooltip (label wrapper) element if `placement` contains "left". */
   [`.${tooltipClasses.popper}[data-popper-placement*="left"] &`]: {
     transformOrigin: 'right center',
-    marginRight: '24px',
-    [theme.breakpoints.up('sm')]: {
-      marginRight: '14px',
-    },
+    marginRight: '14px',
+    ...(styleProps.touch && {
+      marginRight: '24px',
+    }),
   },
   /* Styles applied to the tooltip (label wrapper) element if `placement` contains "right". */
   [`.${tooltipClasses.popper}[data-popper-placement*="right"] &`]: {
     transformOrigin: 'left center',
-    marginLeft: '24px',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: '14px',
-    },
+    marginLeft: '14px',
+    ...(styleProps.touch && {
+      marginLeft: '24px',
+    }),
   },
   /* Styles applied to the tooltip (label wrapper) element if `placement` contains "top". */
   [`.${tooltipClasses.popper}[data-popper-placement*="top"] &`]: {
     transformOrigin: 'center bottom',
-    marginBottom: '24px',
-    [theme.breakpoints.up('sm')]: {
-      marginBottom: '14px',
-    },
+    marginBottom: '14px',
+    ...(styleProps.touch && {
+      marginBottom: '24px',
+    }),
   },
   /* Styles applied to the tooltip (label wrapper) element if `placement` contains "bottom". */
   [`.${tooltipClasses.popper}[data-popper-placement*="bottom"] &`]: {
     transformOrigin: 'center top',
-    marginTop: '24px',
-    [theme.breakpoints.up('sm')]: {
-      marginTop: '14px',
-    },
+    marginTop: '14px',
+    ...(styleProps.touch && {
+      marginTop: '24px',
+    }),
   },
 }));
 
-const TooltipArrow = experimentalStyled(
-  'span',
-  {},
-  {
-    name: 'MuiTooltip',
-    slot: 'Arrow',
-  },
-)(({ theme }) => ({
+const TooltipArrow = experimentalStyled('span', {
+  name: 'MuiTooltip',
+  slot: 'Arrow',
+  overridesResolver: (props, styles) => styles.arrow,
+})(({ theme }) => ({
   /* Styles applied to the arrow element. */
   overflow: 'hidden',
   position: 'absolute',
@@ -224,6 +212,7 @@ const Tooltip = React.forwardRef(function Tooltip(inProps, ref) {
   const {
     arrow = false,
     children,
+    classes: classesProp,
     describeChild = false,
     disableFocusListener = false,
     disableHoverListener = false,
@@ -365,7 +354,6 @@ const Tooltip = React.forwardRef(function Tooltip(inProps, ref) {
     clearTimeout(enterTimer.current);
     clearTimeout(leaveTimer.current);
     if (enterDelay || (hystersisOpen && enterNextDelay)) {
-      event.persist();
       enterTimer.current = setTimeout(
         () => {
           handleOpen(event);
@@ -380,7 +368,6 @@ const Tooltip = React.forwardRef(function Tooltip(inProps, ref) {
   const handleLeave = (event) => {
     clearTimeout(enterTimer.current);
     clearTimeout(leaveTimer.current);
-    event.persist();
     leaveTimer.current = setTimeout(() => {
       handleClose(event);
     }, leaveDelay);
@@ -435,7 +422,6 @@ const Tooltip = React.forwardRef(function Tooltip(inProps, ref) {
     clearTimeout(leaveTimer.current);
     clearTimeout(closeTimer.current);
     stopTouchInteraction();
-    event.persist();
 
     prevUserSelect.current = document.body.style.WebkitUserSelect;
     // Prevent iOS text selection on long-tap.
@@ -454,7 +440,6 @@ const Tooltip = React.forwardRef(function Tooltip(inProps, ref) {
 
     clearTimeout(touchTimer.current);
     clearTimeout(leaveTimer.current);
-    event.persist();
     leaveTimer.current = setTimeout(() => {
       handleClose(event);
     }, leaveTouchDelay);

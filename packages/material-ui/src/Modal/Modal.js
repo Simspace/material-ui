@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { isHostComponent } from '@material-ui/unstyled';
-import { deepmerge, elementAcceptingRef, HTMLElementType } from '@material-ui/utils';
+import { elementAcceptingRef, HTMLElementType } from '@material-ui/utils';
 import ModalUnstyled, { modalUnstyledClasses } from '@material-ui/unstyled/ModalUnstyled';
 import experimentalStyled from '../styles/experimentalStyled';
 import useThemeProps from '../styles/useThemeProps';
@@ -9,30 +9,22 @@ import Backdrop from '../Backdrop';
 
 export const modalClasses = modalUnstyledClasses;
 
-const overridesResolver = (props, styles) => {
-  const { styleProps } = props;
-
-  return deepmerge(
-    {
-      ...(!styleProps.open && styleProps.exited && styles.hidden),
-    },
-    styles.root || {},
-  );
-};
-
 const extendUtilityClasses = (styleProps) => {
   return styleProps.classes;
 };
 
-const ModalRoot = experimentalStyled(
-  'div',
-  {},
-  {
-    name: 'MuiModal',
-    slot: 'Root',
-    overridesResolver,
+const ModalRoot = experimentalStyled('div', {
+  name: 'MuiModal',
+  slot: 'Root',
+  overridesResolver: (props, styles) => {
+    const { styleProps } = props;
+
+    return {
+      ...styles.root,
+      ...(!styleProps.open && styleProps.exited && styles.hidden),
+    };
   },
-)(({ theme, styleProps }) => ({
+})(({ theme, styleProps }) => ({
   /* Styles applied to the root element. */
   position: 'fixed',
   zIndex: theme.zIndex.modal,
@@ -82,7 +74,6 @@ const Modal = React.forwardRef(function Modal(inProps, ref) {
   const [exited, setExited] = React.useState(true);
 
   const commonProps = {
-    BackdropComponent,
     closeAfterTransition,
     disableAutoFocus,
     disableEnforceFocus,
@@ -92,9 +83,6 @@ const Modal = React.forwardRef(function Modal(inProps, ref) {
     disableScrollLock,
     hideBackdrop,
     keepMounted,
-    // private
-    onTransitionEnter: () => setExited(false),
-    onTransitionExited: () => setExited(true),
   };
 
   const styleProps = {
@@ -119,6 +107,9 @@ const Modal = React.forwardRef(function Modal(inProps, ref) {
           }),
         },
       }}
+      BackdropComponent={BackdropComponent}
+      onTransitionEnter={() => setExited(false)}
+      onTransitionExited={() => setExited(true)}
       ref={ref}
       {...other}
       classes={classes}

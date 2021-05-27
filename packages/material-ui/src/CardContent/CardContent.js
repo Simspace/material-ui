@@ -6,8 +6,6 @@ import experimentalStyled from '../styles/experimentalStyled';
 import useThemeProps from '../styles/useThemeProps';
 import { getCardContentUtilityClass } from './cardContentClasses';
 
-const overridesResolver = (props, styles) => styles.root || {};
-
 const useUtilityClasses = (styleProps) => {
   const { classes } = styleProps;
 
@@ -18,15 +16,11 @@ const useUtilityClasses = (styleProps) => {
   return composeClasses(slots, getCardContentUtilityClass, classes);
 };
 
-const CardContentRoot = experimentalStyled(
-  'div',
-  {},
-  {
-    name: 'MuiCardContent',
-    slot: 'Root',
-    overridesResolver,
-  },
-)(() => {
+const CardContentRoot = experimentalStyled('div', {
+  name: 'MuiCardContent',
+  slot: 'Root',
+  overridesResolver: (props, styles) => styles.root,
+})(() => {
   /* Styles applied to the root element. */
   return {
     padding: 16,

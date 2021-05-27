@@ -20,12 +20,12 @@ const useUtilityClasses = (styleProps) => {
   return composeClasses(slots, getSwitchBaseUtilityClass, classes);
 };
 
-const SwitchBaseRoot = experimentalStyled(IconButton)({
+const SwitchBaseRoot = experimentalStyled(IconButton, { skipSx: true })({
   /* Styles applied to the root element. */
   padding: 9,
 });
 
-const SwitchBaseInput = experimentalStyled('input')({
+const SwitchBaseInput = experimentalStyled('input', { skipSx: true })({
   /* Styles applied to the internal input element. */
   cursor: 'inherit',
   position: 'absolute',
@@ -100,13 +100,10 @@ const SwitchBase = React.forwardRef(function SwitchBase(props, ref) {
       return;
     }
 
-    const newChecked = event.target.checked;
-
-    setCheckedState(newChecked);
+    setCheckedState(event.target.checked);
 
     if (onChange) {
-      // TODO v5: remove the second argument.
-      onChange(event, newChecked);
+      onChange(event);
     }
   };
 

@@ -2,50 +2,49 @@ import * as React from 'react';
 import { expect } from 'chai';
 import { spy, stub, useFakeTimers } from 'sinon';
 import {
-  getClasses,
   createMount,
-  describeConformance,
+  describeConformanceV5,
   ErrorBoundary,
   act,
   createClientRender,
   fireEvent,
   screen,
 } from 'test/utils';
-import MenuItem from '../MenuItem';
-import Input from '../Input';
-import InputLabel from '../InputLabel';
-import Select from './Select';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import MenuItem from '@material-ui/core/MenuItem';
+import InputBase from '@material-ui/core/InputBase';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
+import InputLabel from '@material-ui/core/InputLabel';
+import Select from '@material-ui/core/Select';
+import Divider from '@material-ui/core/Divider';
+import classes from './selectClasses';
 
 describe('<Select />', () => {
-  let classes;
   const mount = createMount();
   // StrictModeViolation: triggers "not wrapped in act()" warnings from timers.
   const render = createClientRender({ strict: false });
 
-  before(() => {
-    classes = getClasses(<Select />);
-  });
-
-  describeConformance(<Select value="" />, () => ({
+  describeConformanceV5(<Select value="" />, () => ({
     classes,
-    inheritComponent: Input,
+    inheritComponent: OutlinedInput,
+    render,
     mount,
     refInstanceof: window.HTMLDivElement,
-    skip: ['componentProp', 'rootClass'],
+    muiName: 'MuiSelect',
+    skip: ['componentProp', 'componentsProp', 'themeVariants', 'themeStyleOverrides'],
   }));
 
   describe('prop: inputProps', () => {
     it('should be able to provide a custom classes property', () => {
-      const { container } = render(
+      render(
         <Select
           inputProps={{
-            classes: { root: 'root' },
+            classes: { select: 'select' },
           }}
           value=""
         />,
       );
-
-      expect(container.querySelector(`.${classes.root}`)).to.have.class('root');
+      expect(document.querySelector(`.${classes.select}`)).to.have.class('select');
     });
   });
 
@@ -402,10 +401,10 @@ describe('<Select />', () => {
       expect(getByRole('button', { hidden: true })).to.have.attribute('aria-expanded', 'true');
     });
 
-    specify('aria-expanded is not present if the listbox isnt displayed', () => {
+    specify('ARIA 1.2: aria-expanded="false" if the listbox isnt displayed', () => {
       const { getByRole } = render(<Select value="" />);
 
-      expect(getByRole('button')).not.to.have.attribute('aria-expanded');
+      expect(getByRole('button')).to.have.attribute('aria-expanded', 'false');
     });
 
     it('sets aria-disabled="true" when component is disabled', () => {
@@ -701,7 +700,7 @@ describe('<Select />', () => {
       expect(option).toHaveFocus();
       fireEvent.click(option);
 
-      expect(container.querySelectorAll('.Mui-focused').length).to.equal(0);
+      expect(container.querySelectorAll(classes.focused).length).to.equal(0);
       expect(openSelect).toHaveFocus();
     });
 
@@ -1013,7 +1012,7 @@ describe('<Select />', () => {
   });
 
   it('prevents the default when releasing Space on the children', () => {
-    const keyUpSpy = spy((event) => event.defaultPrevented);
+    const keyUpSpy = spy();
     render(
       <Select value="one" open>
         <MenuItem onKeyUp={keyUpSpy} value="one">
@@ -1025,7 +1024,7 @@ describe('<Select />', () => {
     fireEvent.keyUp(screen.getAllByRole('option')[0], { key: ' ' });
 
     expect(keyUpSpy.callCount).to.equal(1);
-    expect(keyUpSpy.returnValues[0]).to.equal(true);
+    expect(keyUpSpy.firstCall.args[0]).to.have.property('defaultPrevented', true);
   });
 
   it('should pass onClick prop to MenuItem', () => {
@@ -1115,9 +1114,9 @@ describe('<Select />', () => {
 
   it('should not override the event.target on mouse events', () => {
     const handleChange = spy();
-    const handleEvent = spy((event) => event.target);
+    const handleClick = spy();
     render(
-      <div onClick={handleEvent}>
+      <div onClick={handleClick}>
         <Select open onChange={handleChange} value="second">
           <MenuItem value="first" />
           <MenuItem value="second" />
@@ -1129,6 +1128,69 @@ describe('<Select />', () => {
     options[0].click();
 
     expect(handleChange.callCount).to.equal(1);
-    expect(handleEvent.returnValues).to.have.members([options[0]]);
+    expect(handleClick.callCount).to.equal(1);
+    expect(handleClick.firstCall.args[0]).to.have.property('target', options[0]);
+  });
+
+  it('should only select options', () => {
+    const handleChange = spy();
+    render(
+      <Select open onChange={handleChange} value="second">
+        <MenuItem value="first" />
+        <Divider />
+        <MenuItem value="second" />
+      </Select>,
+    );
+
+    const divider = document.querySelector('hr');
+    divider.click();
+    expect(handleChange.callCount).to.equal(0);
+  });
+
+  it('slots overrides should work', function test() {
+    if (/jsdom/.test(window.navigator.userAgent)) {
+      this.skip();
+    }
+
+    const iconStyle = {
+      marginTop: '13px',
+    };
+
+    const nativeInputStyle = {
+      marginTop: '10px',
+    };
+
+    const theme = createTheme({
+      components: {
+        MuiSelect: {
+          styleOverrides: {
+            icon: iconStyle,
+            nativeInput: nativeInputStyle,
+          },
+        },
+      },
+    });
+
+    const { container } = render(
+      <ThemeProvider theme={theme}>
+        <Select open value="first">
+          <MenuItem value="first" />
+          <MenuItem value="second" />
+        </Select>
+      </ThemeProvider>,
+    );
+
+    expect(container.getElementsByClassName(classes.icon)[0]).to.toHaveComputedStyle(iconStyle);
+    expect(container.getElementsByClassName(classes.nativeInput)[0]).to.toHaveComputedStyle(
+      nativeInputStyle,
+    );
+  });
+
+  it('should merge the class names', () => {
+    const { getByTestId } = render(
+      <Select className="foo" input={<InputBase data-testid="root" className="bar" />} value="" />,
+    );
+    expect(getByTestId('root')).to.have.class('foo');
+    expect(getByTestId('root')).to.have.class('bar');
   });
 });

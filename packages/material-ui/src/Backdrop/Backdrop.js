@@ -1,6 +1,5 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { deepmerge } from '@material-ui/utils';
 import { isHostComponent } from '@material-ui/unstyled';
 import BackdropUnstyled, { backdropUnstyledClasses } from '@material-ui/unstyled/BackdropUnstyled';
 import experimentalStyled from '../styles/experimentalStyled';
@@ -9,33 +8,23 @@ import Fade from '../Fade';
 
 export const backdropClasses = backdropUnstyledClasses;
 
-const overridesResolver = (props, styles) => {
-  const { styleProps } = props;
-
-  return deepmerge(
-    {
-      ...(styleProps.invisible && styles.invisible),
-    },
-    styles.root || {},
-  );
-};
-
 const extendUtilityClasses = (styleProps) => {
   const { classes } = styleProps;
   return classes;
 };
 
-const BackdropRoot = experimentalStyled(
-  'div',
-  {},
-  {
-    name: 'MuiBackdrop',
-    slot: 'Root',
-    overridesResolver,
+const BackdropRoot = experimentalStyled('div', {
+  name: 'MuiBackdrop',
+  slot: 'Root',
+  overridesResolver: (props, styles) => {
+    const { styleProps } = props;
+
+    return {
+      ...styles.root,
+      ...(styleProps.invisible && styles.invisible),
+    };
   },
-)(({ styleProps }) => ({
-  // Improve scrollable dialog support.
-  zIndex: -1,
+})(({ styleProps }) => ({
   position: 'fixed',
   display: 'flex',
   alignItems: 'center',

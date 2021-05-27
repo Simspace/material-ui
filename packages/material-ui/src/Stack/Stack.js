@@ -42,7 +42,7 @@ function resolveBreakpointValues({ values, base }) {
 
   return keys.reduce((acc, breakpoint) => {
     if (typeof values === 'object') {
-      acc[breakpoint] = values[breakpoint] || values[previous];
+      acc[breakpoint] = values[breakpoint] != null ? values[breakpoint] : values[previous];
     } else {
       acc[breakpoint] = values;
     }
@@ -72,7 +72,7 @@ export const style = ({ styleProps, theme }) => {
     const transformer = createUnarySpacing(theme);
 
     const base = Object.keys(theme.breakpoints.values).reduce((acc, breakpoint) => {
-      if (styleProps.spacing[breakpoint] || styleProps.direction[breakpoint]) {
+      if (styleProps.spacing[breakpoint] != null || styleProps.direction[breakpoint] != null) {
         acc[breakpoint] = true;
       }
       return acc;
@@ -83,7 +83,7 @@ export const style = ({ styleProps, theme }) => {
 
     const styleFromPropValue = (propValue, breakpoint) => {
       return {
-        '& > :not(styles) + :not(styles)': {
+        '& > :not(style) + :not(style)': {
           margin: 0,
           [`margin${getSideFromDirection(
             breakpoint ? directionValues[breakpoint] : styleProps.direction,
@@ -97,19 +97,26 @@ export const style = ({ styleProps, theme }) => {
   return styles;
 };
 
-const StackRoot = experimentalStyled('div', {}, { name: 'Stack' })(style);
+const StackRoot = experimentalStyled('div', { name: 'Stack' })(style);
 
 const Stack = React.forwardRef(function Stack(inProps, ref) {
   const themeProps = useThemeProps({ props: inProps, name: 'MuiStack' });
   const props = extendSxProp(themeProps);
-  const { direction = 'column', spacing, divider, children, ...other } = props;
+  const {
+    component = 'div',
+    direction = 'column',
+    spacing = 0,
+    divider,
+    children,
+    ...other
+  } = props;
   const styleProps = {
     direction,
     spacing,
   };
 
   return (
-    <StackRoot styleProps={styleProps} ref={ref} {...other}>
+    <StackRoot as={component} styleProps={styleProps} ref={ref} {...other}>
       {divider ? joinChildren(children, divider) : children}
     </StackRoot>
   );
@@ -124,6 +131,11 @@ Stack.propTypes /* remove-proptypes */ = {
    * The content of the component.
    */
   children: PropTypes.node,
+  /**
+   * The component used for the root node.
+   * Either a string to use a HTML element or a component.
+   */
+  component: PropTypes.elementType,
   /**
    * Defines the `flex-direction` style property.
    * It is applied for all screen sizes.
@@ -140,11 +152,13 @@ Stack.propTypes /* remove-proptypes */ = {
   divider: PropTypes.node,
   /**
    * Defines the space between immediate children.
+   * @default 0
    */
   spacing: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.number, PropTypes.string])),
     PropTypes.number,
     PropTypes.object,
+    PropTypes.string,
   ]),
   /**
    * The system prop, which allows defining system overrides as well as additional CSS styles.

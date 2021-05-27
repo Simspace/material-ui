@@ -1,6 +1,6 @@
 import styled from '@material-ui/styled-engine';
-import { propsToClassKey } from '@material-ui/styles';
 import { unstable_styleFunctionSx as styleFunctionSx } from '@material-ui/system';
+import propsToClassKey from './propsToClassKey';
 import defaultTheme from './defaultTheme';
 
 function isEmpty(obj) {
@@ -52,7 +52,7 @@ const variantsResolver = (props, styles, theme, name) => {
   return variantsStyles;
 };
 
-export const shouldForwardProp = (prop) =>
+export const rootShouldForwardProp = (prop) =>
   prop !== 'styleProps' &&
   prop !== 'theme' &&
   prop !== 'isRtl' &&
@@ -60,17 +60,30 @@ export const shouldForwardProp = (prop) =>
   prop !== 'as' &&
   prop !== 'classes';
 
+export const slotShouldForwardProp = (prop) =>
+  prop !== 'styleProps' && prop !== 'theme' && prop !== 'isRtl' && prop !== 'sx' && prop !== 'as';
+
 const lowercaseFirstLetter = (string) => {
   return string.charAt(0).toLowerCase() + string.slice(1);
 };
 
-const experimentalStyled = (tag, options, muiOptions = {}) => {
-  const componentName = muiOptions.name;
-  const componentSlot = muiOptions.slot;
+const experimentalStyled = (tag, inputOptions = {}) => {
+  const {
+    name: componentName,
+    slot: componentSlot,
+    skipVariantsResolver: inputSkipVariantsResolver,
+    skipSx: inputSkipSx,
+    overridesResolver,
+    ...options
+  } = inputOptions;
 
-  const overridesResolver = muiOptions.overridesResolver;
-  const skipVariantsResolver = muiOptions.skipVariantsResolver || false;
-  const skipSx = muiOptions.skipSx || false;
+  // if skipVariantsResolver option is defined, take the value, otherwise, true for root and false for other slots
+  const skipVariantsResolver =
+    inputSkipVariantsResolver !== undefined
+      ? inputSkipVariantsResolver
+      : (componentSlot && componentSlot !== 'Root') || false;
+
+  const skipSx = inputSkipSx || false;
 
   let displayName;
   let className;
@@ -81,7 +94,9 @@ const experimentalStyled = (tag, options, muiOptions = {}) => {
   }
 
   const defaultStyledResolver = styled(tag, {
-    shouldForwardProp,
+    ...(!componentSlot || componentSlot === 'Root'
+      ? { shouldForwardProp: rootShouldForwardProp }
+      : { shouldForwardProp: slotShouldForwardProp }),
     label: className || componentName || '',
     ...options,
   });

@@ -1,17 +1,15 @@
 import * as React from 'react';
 import { useForkRef } from '@material-ui/core/utils';
 import { WrapperVariantContext } from './WrapperVariantContext';
-import { KeyboardDateInput } from '../KeyboardDateInput';
 import { executeInTheNextEventLoopTick } from '../utils';
 import PickersPopper from '../PickersPopper';
-import { PrivateWrapperProps } from './WrapperProps';
-import { DesktopWrapperProps } from './DesktopWrapper';
+import { InternalDesktopWrapperProps } from './DesktopWrapper';
 
-const DesktopTooltipWrapper: React.FC<PrivateWrapperProps & DesktopWrapperProps> = (props) => {
+function DesktopTooltipWrapper(props: InternalDesktopWrapperProps) {
   const {
     children,
     DateInputProps,
-    KeyboardDateInputComponent = KeyboardDateInput,
+    KeyboardDateInputComponent,
     onDismiss,
     open,
     PopperProps,
@@ -52,6 +50,6 @@ const DesktopTooltipWrapper: React.FC<PrivateWrapperProps & DesktopWrapperProps>
       </PickersPopper>
     </WrapperVariantContext.Provider>
   );
-};
+}
 
 export default DesktopTooltipWrapper;

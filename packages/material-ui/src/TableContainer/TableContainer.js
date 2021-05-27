@@ -6,8 +6,6 @@ import useThemeProps from '../styles/useThemeProps';
 import experimentalStyled from '../styles/experimentalStyled';
 import { getTableContainerUtilityClass } from './tableContainerClasses';
 
-const overridesResolver = (props, styles) => styles.root || {};
-
 const useUtilityClasses = (styleProps) => {
   const { classes } = styleProps;
 
@@ -18,15 +16,11 @@ const useUtilityClasses = (styleProps) => {
   return composeClasses(slots, getTableContainerUtilityClass, classes);
 };
 
-const TableContainerRoot = experimentalStyled(
-  'div',
-  {},
-  {
-    name: 'MuiTableContainer',
-    slot: 'Root',
-    overridesResolver,
-  },
-)({
+const TableContainerRoot = experimentalStyled('div', {
+  name: 'MuiTableContainer',
+  slot: 'Root',
+  overridesResolver: (props, styles) => styles.root,
+})({
   /* Styles applied to the root element. */
   width: '100%',
   overflowX: 'auto',

@@ -7,8 +7,6 @@ import useThemeProps from '../styles/useThemeProps';
 import experimentalStyled from '../styles/experimentalStyled';
 import { getTableHeadUtilityClass } from './tableHeadClasses';
 
-const overridesResolver = (props, styles) => styles.root || {};
-
 const useUtilityClasses = (styleProps) => {
   const { classes } = styleProps;
 
@@ -19,15 +17,11 @@ const useUtilityClasses = (styleProps) => {
   return composeClasses(slots, getTableHeadUtilityClass, classes);
 };
 
-const TableHeadRoot = experimentalStyled(
-  'thead',
-  {},
-  {
-    name: 'MuiTableHead',
-    slot: 'Root',
-    overridesResolver,
-  },
-)({
+const TableHeadRoot = experimentalStyled('thead', {
+  name: 'MuiTableHead',
+  slot: 'Root',
+  overridesResolver: (props, styles) => styles.root,
+})({
   /* Styles applied to the root element. */
   display: 'table-header-group',
 });

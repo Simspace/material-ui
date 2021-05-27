@@ -40,14 +40,14 @@ type DefaultBreakPoints = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export function handleBreakpoints<Props>(
   props: Props,
   propValue: any,
-  styleFromPropValue: (value: any) => any
+  styleFromPropValue: (value: any) => any,
 ): any;
 
 /**
  * @returns An enhanced stylefunction that considers breakpoints
  */
 export function breakpoints<Props, Breakpoints extends string = DefaultBreakPoints>(
-  styleFunction: StyleFunction<Props>
+  styleFunction: StyleFunction<Props>,
 ): StyleFunction<Partial<Record<Breakpoints, Props>> & Props>;
 
 // restructures the breakpoints in the in the correct order and merges all styles args
@@ -181,9 +181,7 @@ export const spacing: SimpleStyleFunction<
   | 'paddingY'
 >;
 export type SpacingProps = PropsFor<typeof spacing>;
-export function createUnarySpacing<Spacing>(theme: {
-  spacing: Spacing;
-}): Spacing extends number
+export function createUnarySpacing<Spacing>(theme: { spacing: Spacing }): Spacing extends number
   ? (abs: number | string) => number | number
   : Spacing extends any[]
   ? <Index extends number>(abs: Index | string) => Spacing[Index] | string
@@ -241,7 +239,7 @@ export interface StyleOptions<PropKey> {
   transform?: (cssValue: unknown) => number | string | React.CSSProperties | CSSObject;
 }
 export function style<PropKey extends string, Theme extends object>(
-  options: StyleOptions<PropKey>
+  options: StyleOptions<PropKey>,
 ): StyleFunction<{ [K in PropKey]?: unknown } & { theme: Theme }>;
 
 // typography.js
@@ -308,7 +306,7 @@ export type SimpleSystemKeys = keyof Omit<
         typeof shadows,
         typeof sizing,
         typeof spacing,
-        typeof typography
+        typeof typography,
       ]
     >
   >,

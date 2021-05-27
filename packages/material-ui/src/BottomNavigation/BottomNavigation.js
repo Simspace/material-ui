@@ -7,8 +7,6 @@ import experimentalStyled from '../styles/experimentalStyled';
 import useThemeProps from '../styles/useThemeProps';
 import { getBottomNavigationUtilityClass } from './bottomNavigationClasses';
 
-const overridesResolver = (props, styles) => styles.root || {};
-
 const useUtilityClasses = (styleProps) => {
   const { classes } = styleProps;
 
@@ -19,15 +17,11 @@ const useUtilityClasses = (styleProps) => {
   return composeClasses(slots, getBottomNavigationUtilityClass, classes);
 };
 
-const BottomNavigationRoot = experimentalStyled(
-  'div',
-  {},
-  {
-    name: 'MuiBottomNavigation',
-    slot: 'Root',
-    overridesResolver,
-  },
-)(({ theme }) => ({
+const BottomNavigationRoot = experimentalStyled('div', {
+  name: 'MuiBottomNavigation',
+  slot: 'Root',
+  overridesResolver: (props, styles) => styles.root,
+})(({ theme }) => ({
   /* Styles applied to the root element. */
   display: 'flex',
   justifyContent: 'center',

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import { deepmerge } from '@material-ui/utils';
 import { unstable_composeClasses as composeClasses } from '@material-ui/unstyled';
 import experimentalStyled from '../styles/experimentalStyled';
 import useThemeProps from '../styles/useThemeProps';
@@ -10,16 +9,6 @@ import AccordionContext from '../Accordion/AccordionContext';
 import accordionSummaryClasses, {
   getAccordionSummaryUtilityClass,
 } from './accordionSummaryClasses';
-
-const overridesResolver = (props, styles) => {
-  return deepmerge(
-    {
-      [`& .${accordionSummaryClasses.content}`]: styles.content,
-      [`& .${accordionSummaryClasses.expandIconWrapper}`]: styles.expandIconWrapper,
-    },
-    styles.root || {},
-  );
-};
 
 const useUtilityClasses = (styleProps) => {
   const { classes, expanded, disabled, disableGutters } = styleProps;
@@ -34,15 +23,11 @@ const useUtilityClasses = (styleProps) => {
   return composeClasses(slots, getAccordionSummaryUtilityClass, classes);
 };
 
-const AccordionSummaryRoot = experimentalStyled(
-  ButtonBase,
-  {},
-  {
-    name: 'MuiAccordionSummary',
-    slot: 'Root',
-    overridesResolver,
-  },
-)(({ theme, styleProps }) => {
+const AccordionSummaryRoot = experimentalStyled(ButtonBase, {
+  name: 'MuiAccordionSummary',
+  slot: 'Root',
+  overridesResolver: (props, styles) => styles.root,
+})(({ theme, styleProps }) => {
   const transition = {
     duration: theme.transitions.duration.shortest,
   };
@@ -73,14 +58,11 @@ const AccordionSummaryRoot = experimentalStyled(
   };
 });
 
-const AccordionSummaryContent = experimentalStyled(
-  'div',
-  {},
-  {
-    name: 'MuiAccordionSummary',
-    slot: 'Content',
-  },
-)(({ theme, styleProps }) => ({
+const AccordionSummaryContent = experimentalStyled('div', {
+  name: 'MuiAccordionSummary',
+  slot: 'Content',
+  overridesResolver: (props, styles) => styles.content,
+})(({ theme, styleProps }) => ({
   /* Styles applied to the children wrapper element. */
   display: 'flex',
   flexGrow: 1,
@@ -96,14 +78,11 @@ const AccordionSummaryContent = experimentalStyled(
   }),
 }));
 
-const AccordionSummaryExpandIconWrapper = experimentalStyled(
-  'div',
-  {},
-  {
-    name: 'MuiAccordionSummary',
-    slot: 'ExpandIconWrapper',
-  },
-)(({ theme }) => ({
+const AccordionSummaryExpandIconWrapper = experimentalStyled('div', {
+  name: 'MuiAccordionSummary',
+  slot: 'ExpandIconWrapper',
+  overridesResolver: (props, styles) => styles.expandIconWrapper,
+})(({ theme }) => ({
   /* Styles applied to the `expandIcon`'s wrapper element. */
   display: 'flex',
   color: theme.palette.action.active,

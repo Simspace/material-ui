@@ -7,8 +7,6 @@ import useThemeProps from '../styles/useThemeProps';
 import experimentalStyled from '../styles/experimentalStyled';
 import { getTableBodyUtilityClass } from './tableBodyClasses';
 
-const overridesResolver = (props, styles) => styles.root || {};
-
 const useUtilityClasses = (styleProps) => {
   const { classes } = styleProps;
 
@@ -19,15 +17,11 @@ const useUtilityClasses = (styleProps) => {
   return composeClasses(slots, getTableBodyUtilityClass, classes);
 };
 
-const TableBodyRoot = experimentalStyled(
-  'tbody',
-  {},
-  {
-    name: 'MuiTableBody',
-    slot: 'Root',
-    overridesResolver,
-  },
-)({
+const TableBodyRoot = experimentalStyled('tbody', {
+  name: 'MuiTableBody',
+  slot: 'Root',
+  overridesResolver: (props, styles) => styles.root,
+})({
   /* Styles applied to the root element. */
   display: 'table-row-group',
 });

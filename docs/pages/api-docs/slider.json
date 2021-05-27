@@ -5,7 +5,10 @@
     "aria-valuetext": { "type": { "name": "custom", "description": "string" } },
     "classes": { "type": { "name": "object" } },
     "color": {
-      "type": { "name": "enum", "description": "'primary'<br>&#124;&nbsp;'secondary'" },
+      "type": {
+        "name": "union",
+        "description": "'primary'<br>&#124;&nbsp;'secondary'<br>&#124;&nbsp;string"
+      },
       "default": "'primary'"
     },
     "component": { "type": { "name": "elementType" } },
@@ -21,6 +24,7 @@
       "type": { "name": "union", "description": "Array&lt;number&gt;<br>&#124;&nbsp;number" }
     },
     "disabled": { "type": { "name": "bool" } },
+    "disableSwap": { "type": { "name": "bool" } },
     "getAriaLabel": { "type": { "name": "func" } },
     "getAriaValueText": { "type": { "name": "func" } },
     "isRtl": { "type": { "name": "bool" } },

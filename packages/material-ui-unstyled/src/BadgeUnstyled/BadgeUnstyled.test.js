@@ -16,6 +16,7 @@ describe('<BadgeUnstyled />', () => {
     () => ({
       classes,
       inheritComponent: 'span',
+      render,
       mount,
       refInstanceof: window.HTMLSpanElement,
       testComponentPropWith: 'div',
@@ -27,10 +28,10 @@ describe('<BadgeUnstyled />', () => {
     let theme = null;
 
     const Root = React.forwardRef(
-      ({ styleProps: stylePropsProp, theme: themeProp, ...rest }, ref) => {
+      ({ styleProps: stylePropsProp, theme: themeProp, ...other }, ref) => {
         styleProps = stylePropsProp;
         theme = themeProp;
-        return <span ref={ref} {...rest} />;
+        return <span ref={ref} {...other} />;
       },
     );
 

@@ -1,7 +1,5 @@
-import { RangeInput, NonEmptyDateRange, DateRange } from '../../DateRangePicker/RangeTypes';
-import { arrayIncludes } from './utils';
-import { ParsableDate } from './constants/prop-types';
-import { DatePickerView } from './typings/Views';
+import { NonEmptyDateRange, DateRange } from '../../DateRangePicker/RangeTypes';
+import { ParseableDate } from './constants/prop-types';
 import { MuiPickersAdapter } from './hooks/useUtils';
 
 interface FindClosestDateParams<TDate> {
@@ -75,42 +73,13 @@ export const findClosestEnabledDate = <TDate>({
   return utils.date();
 };
 
-export const isYearOnlyView = (views: readonly DatePickerView[]) =>
-  views.length === 1 && views[0] === 'year';
-
-export const isYearAndMonthViews = (views: readonly DatePickerView[]) =>
-  views.length === 2 && arrayIncludes(views, 'month') && arrayIncludes(views, 'year');
-
-export const getFormatAndMaskByViews = (
-  views: readonly DatePickerView[],
-  utils: MuiPickersAdapter,
-) => {
-  if (isYearOnlyView(views)) {
-    return {
-      mask: '____',
-      inputFormat: utils.formats.year,
-    };
-  }
-
-  if (isYearAndMonthViews(views)) {
-    return {
-      disableMaskedInput: true,
-      inputFormat: utils.formats.monthAndYear,
-    };
-  }
-
-  return {
-    mask: '__/__/____',
-    inputFormat: utils.formats.keyboardDate,
-  };
-};
-
 export function parsePickerInputValue(utils: MuiPickersAdapter, value: unknown): unknown {
   const parsedValue = utils.date(value);
 
   return utils.isValid(parsedValue) ? parsedValue : null;
 }
 
+export type RangeInput<TDate> = import('../../DateRangePicker/RangeTypes').RangeInput<TDate>;
 export function parseRangeInputValue<TDate>(
   utils: MuiPickersAdapter,
   value: RangeInput<TDate> = [null, null],
@@ -180,7 +149,7 @@ export interface DateValidationProps<TDate> {
 
 export const validateDate = <TDate>(
   utils: MuiPickersAdapter<TDate>,
-  value: TDate | ParsableDate,
+  value: TDate | ParseableDate<TDate>,
   { disablePast, disableFuture, minDate, maxDate, shouldDisableDate }: DateValidationProps<TDate>,
 ) => {
   const now = utils.date()!;
@@ -230,10 +199,10 @@ export const validateDateRange = <TDate>(
     return [null, null];
   }
 
-  const dateValidations = [
+  const dateValidations: [DateRangeValidationErrorValue, DateRangeValidationErrorValue] = [
     validateDate(utils, start, dateValidationProps),
     validateDate(utils, end, dateValidationProps),
-  ] as [DateRangeValidationErrorValue, DateRangeValidationErrorValue];
+  ];
 
   if (dateValidations[0] || dateValidations[1]) {
     return dateValidations;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as CSS from 'csstype';
 import { SxProps } from '@material-ui/system';
-import { Theme as DefaultTheme } from './createMuiTheme';
+import { Theme as DefaultTheme } from './createTheme';
 
 export interface SerializedStyles {
   name: string;
@@ -14,10 +14,10 @@ export type CSSProperties = CSS.PropertiesFallback<number | string>;
 export type CSSPropertiesWithMultiValues = {
   [K in keyof CSSProperties]: CSSProperties[K] | Array<Extract<CSSProperties[K], string>>;
 };
-export type CSSPseudos = { [K in CSS.Pseudos]?: CSSObject };
+export type CSSPseudos = { [K in CSS.Pseudos]?: unknown | CSSObject };
 
 export interface CSSOthersObject {
-  [propertiesName: string]: CSSInterpolation;
+  [propertiesName: string]: unknown | CSSInterpolation;
 }
 export type CSSPseudosForCSSObject = { [K in CSS.Pseudos]?: CSSObject };
 
@@ -70,9 +70,8 @@ export type Interpolation<Props> =
  * @desc Utility type for getting props type of React component.
  * It takes `defaultProps` into an account - making props with defaults optional.
  */
-export type PropsOf<
-  C extends keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>
-> = JSX.LibraryManagedAttributes<C, React.ComponentProps<C>>;
+export type PropsOf<C extends keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>> =
+  JSX.LibraryManagedAttributes<C, React.ComponentProps<C>>;
 
 export type Overwrapped<T, U> = Pick<T, Extract<keyof T, keyof U>>;
 
@@ -85,10 +84,10 @@ export interface StyledComponent<InnerProps, StyleProps, Theme extends object>
    * @desc this method is type-unsafe
    */
   withComponent<NewTag extends keyof JSXInEl>(
-    tag: NewTag
+    tag: NewTag,
   ): StyledComponent<JSXInEl[NewTag], StyleProps, Theme>;
-  withComponent<Tag extends React.ComponentType<any>>(
-    tag: Tag
+  withComponent<Tag extends React.JSXElementConstructor<any>>(
+    tag: Tag,
   ): StyledComponent<PropsOf<Tag>, StyleProps, Theme>;
 }
 
@@ -101,7 +100,7 @@ export interface StyledOptions {
 interface MuiStyledOptions {
   name?: string;
   slot?: string;
-  overridesResolver?: (props: any, styles: string | object) => string | object;
+  overridesResolver?: (props: any, styles: Record<string, any>) => Record<string, any>;
   skipVariantsResolver?: boolean;
   skipSx?: boolean;
 }
@@ -120,7 +119,7 @@ export interface FilteringStyledOptions<Props, ForwardedProps extends keyof Prop
 export interface CreateStyledComponent<
   ComponentProps extends {},
   SpecificComponentProps extends {} = {},
-  JSXProps extends {} = {}
+  JSXProps extends {} = {},
 > {
   /**
    * @typeparam AdditionalProps  Additional props to add to your styled component
@@ -156,16 +155,16 @@ export interface CreateStyledComponent<
 export interface CreateMUIStyled<Theme extends object = DefaultTheme> {
   <
     C extends React.ComponentClass<React.ComponentProps<C>>,
-    ForwardedProps extends keyof React.ComponentProps<C> = keyof React.ComponentProps<C>
+    ForwardedProps extends keyof React.ComponentProps<C> = keyof React.ComponentProps<C>,
   >(
     component: C,
-    options: FilteringStyledOptions<React.ComponentProps<C>, ForwardedProps>,
-    muiOptions?: MuiStyledOptions
+    options: FilteringStyledOptions<React.ComponentProps<C>, ForwardedProps> & MuiStyledOptions,
   ): CreateStyledComponent<
     Pick<PropsOf<C>, ForwardedProps> & {
       theme?: Theme;
       as?: React.ElementType;
       sx?: SxProps<Theme>;
+      styleProps?: Record<string, unknown>;
     },
     {},
     {
@@ -175,13 +174,13 @@ export interface CreateMUIStyled<Theme extends object = DefaultTheme> {
 
   <C extends React.ComponentClass<React.ComponentProps<C>>>(
     component: C,
-    options?: StyledOptions,
-    muiOptions?: MuiStyledOptions
+    options?: StyledOptions & MuiStyledOptions,
   ): CreateStyledComponent<
     PropsOf<C> & {
       theme?: Theme;
       as?: React.ElementType;
       sx?: SxProps<Theme>;
+      styleProps?: Record<string, unknown>;
     },
     {},
     {
@@ -190,50 +189,58 @@ export interface CreateMUIStyled<Theme extends object = DefaultTheme> {
   >;
 
   <
-    C extends React.ComponentType<React.ComponentProps<C>>,
-    ForwardedProps extends keyof React.ComponentProps<C> = keyof React.ComponentProps<C>
+    C extends React.JSXElementConstructor<React.ComponentProps<C>>,
+    ForwardedProps extends keyof React.ComponentProps<C> = keyof React.ComponentProps<C>,
   >(
     component: C,
-    options: FilteringStyledOptions<React.ComponentProps<C>, ForwardedProps>,
-    muiOptions?: MuiStyledOptions
+    options: FilteringStyledOptions<React.ComponentProps<C>, ForwardedProps> & MuiStyledOptions,
   ): CreateStyledComponent<
     Pick<PropsOf<C>, ForwardedProps> & {
       theme?: Theme;
       as?: React.ElementType;
       sx?: SxProps<Theme>;
+      styleProps?: Record<string, unknown>;
     }
   >;
 
-  <C extends React.ComponentType<React.ComponentProps<C>>>(
+  <C extends React.JSXElementConstructor<React.ComponentProps<C>>>(
     component: C,
-    options?: StyledOptions,
-    muiOptions?: MuiStyledOptions
+    options?: StyledOptions & MuiStyledOptions,
   ): CreateStyledComponent<
     PropsOf<C> & {
       theme?: Theme;
       as?: React.ElementType;
       sx?: SxProps<Theme>;
+      styleProps?: Record<string, unknown>;
     }
   >;
 
   <
     Tag extends keyof JSX.IntrinsicElements,
-    ForwardedProps extends keyof JSX.IntrinsicElements[Tag] = keyof JSX.IntrinsicElements[Tag]
+    ForwardedProps extends keyof JSX.IntrinsicElements[Tag] = keyof JSX.IntrinsicElements[Tag],
   >(
     tag: Tag,
-    options: FilteringStyledOptions<JSX.IntrinsicElements[Tag], ForwardedProps>,
-    muiOptions?: MuiStyledOptions
+    options: FilteringStyledOptions<JSX.IntrinsicElements[Tag], ForwardedProps> & MuiStyledOptions,
   ): CreateStyledComponent<
-    { theme?: Theme; as?: React.ElementType; sx?: SxProps<Theme> },
+    {
+      theme?: Theme;
+      as?: React.ElementType;
+      sx?: SxProps<Theme>;
+      styleProps?: Record<string, unknown>;
+    },
     Pick<JSX.IntrinsicElements[Tag], ForwardedProps>
   >;
 
   <Tag extends keyof JSX.IntrinsicElements>(
     tag: Tag,
-    options?: StyledOptions,
-    muiOptions?: MuiStyledOptions
+    options?: StyledOptions & MuiStyledOptions,
   ): CreateStyledComponent<
-    { theme?: Theme; as?: React.ElementType; sx?: SxProps<Theme> },
+    {
+      theme?: Theme;
+      as?: React.ElementType;
+      sx?: SxProps<Theme>;
+      styleProps?: Record<string, unknown>;
+    },
     JSX.IntrinsicElements[Tag]
   >;
 }
@@ -243,7 +250,6 @@ export interface CreateMUIStyled<Theme extends object = DefaultTheme> {
  *
  * @param tag HTML tag or component that should serve as base.
  * @param options Styled options for the created component.
- * @param muiOptions Material-UI specific style options.
  * @returns React component that has styles attached to it.
  */
 declare const experimentalStyled: CreateMUIStyled;

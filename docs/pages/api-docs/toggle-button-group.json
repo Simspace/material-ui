@@ -10,6 +10,7 @@
       "default": "'standard'"
     },
     "exclusive": { "type": { "name": "bool" } },
+    "fullWidth": { "type": { "name": "bool" } },
     "onChange": { "type": { "name": "func" } },
     "orientation": {
       "type": { "name": "enum", "description": "'horizontal'<br>&#124;&nbsp;'vertical'" },
@@ -17,8 +18,8 @@
     },
     "size": {
       "type": {
-        "name": "enum",
-        "description": "'large'<br>&#124;&nbsp;'medium'<br>&#124;&nbsp;'small'"
+        "name": "union",
+        "description": "'large'<br>&#124;&nbsp;'medium'<br>&#124;&nbsp;'small'<br>&#124;&nbsp;string"
       },
       "default": "'medium'"
     },
